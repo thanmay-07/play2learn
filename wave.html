@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Play2Learn - Wave Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #e3f2fd;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background: #1565c0;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+    }
+    .question {
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #0d47a1;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0d47a1;
+    }
+    .info-box {
+      margin: 10px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      width: 90%;
+      max-width: 600px;
+      display: none;
+    }
+    canvas {
+      background: #bbdefb;
+      margin-top: 20px;
+      border: 1px solid #333;
+    }
+    .slider-group {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 20px;
+    }
+    .slider-group label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>Wave Simulation - Play2Learn</header>
+
+<div class="question">❓ Have you ever hit a whistle and wondered why it makes that sound? Want to know the physics of waves? 🎶</div>
+
+<div class="buttons">
+  <button onclick="showInfo('hint')">Hint</button>
+  <button onclick="showInfo('concept')">Concept Explanation</button>
+  <button onclick="startSimulation()">Start Simulation</button>
+</div>
+
+<div id="hint" class="info-box">
+  💡 Hint: A wave is a disturbance that travels through a medium, transferring energy. The whistle creates sound waves at specific frequencies!
+</div>
+
+<div id="concept" class="info-box">
+  📚 Concept Explanation: Waves consist of crests and troughs. Their <b>Amplitude</b> determines the height, <b>Frequency</b> controls how often they repeat, and <b>Speed</b> defines how fast they move. The sound of a whistle depends on resonance, amplifying certain frequencies due to constructive interference.
+</div>
+
+<canvas id="waveCanvas" width="600" height="400"></canvas>
+
+<div class="slider-group">
+  <label>Amplitude
+    <input type="range" id="ampSlider" min="10" max="100" value="50" oninput="updateAmplitude()" />
+  </label>
+  <label>Frequency
+    <input type="range" id="freqSlider" min="1" max="10" value="5" oninput="updateFrequency()" />
+  </label>
+  <label>Speed
+    <input type="range" id="speedSlider" min="1" max="10" value="5" oninput="updateSpeed()" />
+  </label>
+</div>
+
+<script>
+  const canvas = document.getElementById("waveCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let amplitude = 50;
+  let frequency = 5;
+  let speed = 5;
+  let phase = 0;
+
+  function showInfo(type) {
+    document.getElementById("hint").style.display = "none";
+    document.getElementById("concept").style.display = "none";
+    document.getElementById(type).style.display = "block";
+  }
+
+  function updateAmplitude() {
+    amplitude = parseInt(document.getElementById("ampSlider").value);
+  }
+
+  function updateFrequency() {
+    frequency = parseInt(document.getElementById("freqSlider").value);
+  }
+
+  function updateSpeed() {
+    speed = parseInt(document.getElementById("speedSlider").value);
+  }
+
+  function startSimulation() {
+    requestAnimationFrame(drawWave);
+  }
+
+  function drawWave() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+
+    for (let x = 0; x < canvas.width; x++) {
+      let y = canvas.height / 2 + amplitude * Math.sin((x * frequency * 0.01) + phase);
+      ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = "#1e88e5";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    phase += speed * 0.05;
+
+    requestAnimationFrame(drawWave);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rain Umbrella Simulation - Play2Learn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e0f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin: 20px;
+      color: #006064;
+    }
+    .question {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      color: #004d40;
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+    .btn {
+      background: #00838f;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .btn:hover {
+      background: #00acc1;
+    }
+    #simulationArea {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      background: linear-gradient(#b2ebf2, #4dd0e1);
+      border: 2px solid #006064;
+      overflow: hidden;
+    }
+    #man {
+      position: absolute;
+      bottom: 0;
+      left: 250px;
+      width: 100px;
+    }
+    #umbrella {
+      position: absolute;
+      bottom: 120px;
+      left: 265px;
+      width: 100px;
+      transform-origin: bottom center;
+      transition: transform 0.2s;
+      top:295px;
+      left:47.6%;
+      opacity:0.5;
+      transform: rotate(-45deg); /* Rotate the umbrella by 45 degrees anticlockwise */
+    }
+    .rainDrop {
+      position: absolute;
+      width: 6px; /* Wider rain drops */
+      height: 40px; /* Longer rain drops */
+      background: blue;
+      animation: fall 2s linear infinite;
+    }
+    @keyframes fall {
+      0% { top: -40px; }
+      100% { top: 400px; }
+    }
+    .sliders {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .slider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #d50000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Rain Umbrella Simulation</h1>
+<div class="question">
+  Don’t you like to get wet while running in rain? Then how to crack the umbrella position?
+</div>
+
+<div class="controls">
+  <button class="btn" onclick="showHint()">Hint</button>
+  <button class="btn" onclick="showConcept()">Concept</button>
+  <button class="btn" onclick="startSimulation()">Simulation</button>
+</div>
+
+<div id="simulationArea">
+  <img id="man" style="positon:absolute;bottom:0px;left:42%;"src="https://media.istockphoto.com/id/1125038961/photo/young-man-running-outdoors-in-morning.jpg?s=1024x1024&w=is&k=20&c=n93U-5CVLB-0d4jnOcNXqcTo0Msd4O6iPqi0FJKVncU=">
+  <img id="umbrella"style="height:50px;width:50px;" src="https://www.umbrellaheaven.com/wp-content/uploads/2017/01/Blue-Open-1-800x800.jpg" alt="Umbrella">
+</div>
+
+<div class="sliders">
+  <div class="slider">
+    <label>Man Speed (m/s): <span id="speedValue">0</span></label>
+    <input type="range" min="0" max="20" value="0" id="speedSlider" oninput="updateSpeed(this.value)">
+  </div>
+  <div class="slider">
+    <label>Umbrella Angle (°): <span id="angleValue">45</span></label>
+    <input type="range" min="0" max="180" value="45" id="angleSlider" oninput="updateAngle(this.value)">
+  </div>
+</div>
+
+<div class="result" id="resultText"></div>
+
+<script>
+  let speed = 0;
+  let umbrellaAngle = 45; // Set initial umbrella angle to 45 degrees
+  let rainAngle = 90; // Starts vertically downward
+  const umbrella = document.getElementById("umbrella");
+  const resultText = document.getElementById("resultText");
+
+  function showHint() {
+    alert("Hint: The faster you run, the more slanted the rain appears to you!\nUse tan(θ) = Vr / Vm.");
+  }
+
+  function showConcept() {
+    alert("Concept:\nRain has a vertical velocity (Vr).\nWhen you run with speed Vm, relative rain direction tilts by tan(θ) = Vr / Vm.\nPlace your umbrella opposite to the rain's angle to stay dry!\nAngle = θ (relative rain angle), so ideal umbrella direction is θ degrees.");
+  }
+
+  function startSimulation() {
+    generateRain();
+    checkWetStatus();
+  }
+
+  function updateSpeed(val) {
+    speed = parseFloat(val);
+    document.getElementById("speedValue").innerText = val;
+    calculateRainAngle();
+  }
+
+  function updateAngle(val) {
+    umbrellaAngle = parseFloat(val);
+    document.getElementById("angleValue").innerText = val;
+    umbrella.style.transform = `rotate(${umbrellaAngle - 45}deg)`; // Adjust for 45-degree anticlockwise rotation
+    checkWetStatus();
+  }
+
+  function calculateRainAngle() {
+    const Vr = 10; // Rain falling speed
+    let thetaRad = Math.atan(Vr / speed);
+    rainAngle = (speed === 0) ? 90 : (thetaRad * 180 / Math.PI);
+    updateRainDirection();
+    checkWetStatus();
+  }
+
+  function updateRainDirection() {
+    const rainElements = document.querySelectorAll(".rainDrop");
+    rainElements.forEach(drop => {
+      drop.style.transform = `rotate(${90 - rainAngle}deg)`;
+    });
+  }
+
+  function checkWetStatus() {
+    const recommendedAngle = 90-rainAngle;
+    const difference = Math.abs(umbrellaAngle - recommendedAngle);
+    if (difference > 7) {
+      resultText.innerText = "You are getting WET! Adjust the umbrella!";
+      resultText.style.color = "#d50000";
+    } else {
+      resultText.innerText = "Perfect! You are staying DRY!";
+      resultText.style.color = "green";
+    }
+  }
+
+  function generateRain() {
+    const simArea = document.getElementById("simulationArea");
+    simArea.querySelectorAll('.rainDrop').forEach(e => e.remove()); // Clear old drops
+    for (let i = 0; i < 100; i++) {
+      let drop = document.createElement("div");
+      drop.className = "rainDrop";
+      drop.style.left = Math.random() * 600 + "px";
+      drop.style.transform = `rotate(${90 - rainAngle}deg)`;
+      simArea.appendChild(drop);
+    }
+  }
+
+  // Initial setup
+  calculateRainAngle();
+  updateAngle(45);
+</script>
+
+</body>
+</html>

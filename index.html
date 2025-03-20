@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Play2Learn Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .portal-container {
+      text-align: center;
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .question {
+      margin: 20px 0;
+      font-weight: bold;
+      color: #444;
+      min-height: 50px;
+    }
+    button {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="portal-container">
+    <h1>Play2Learn Physics Simulations</h1>
+    <div class="question" id="question">Choose a simulation to explore!</div>
+    <button onclick="openSimulation('rain.html', 'Don’t you like to avoid getting wet in the rain while running? Discover how to crack the best umbrella position!')">Rain Simulation</button>
+    <button onclick="openSimulation('sundial.html', 'Do you know how ancient people told time based on the sun? Explore the sundial method!')">Sundial Simulation</button>
+    <button onclick="openSimulation('wave.html', 'Ever wondered how waves create those mesmerizing patterns? Dive into wave physics!')">Wave Simulation</button>
+  </div>
+
+  <script>
+    function openSimulation(url, question) {
+      document.getElementById('question').innerText = question;
+      setTimeout(() => {
+        window.location.href = url;
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sundial Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    #sundial {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      background-color: #e2c97d;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+    }
+    #sun {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      background-color: yellow;
+      border-radius: 50%;
+      transform-origin: 50% 50%;
+      transition: transform 0.5s;
+    }
+    #clock {
+      margin-top: 20px;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      border-radius: 50%;
+      border: 5px solid #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hand {
+      position: absolute;
+      width: 2px;
+      height: 80px;
+      background-color: black;
+      transform-origin: bottom;
+      top: 10px;
+    }
+    .hour {
+      transform: rotate(0deg);
+      height: 60px;
+    }
+    .minute {
+      transform: rotate(0deg);
+      height: 70px;
+    }
+    .time-info {
+      margin-top: 20px;
+    }
+    #sunPositionSlider {
+      width: 300px;
+      margin-top: 30px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sundial Simulation</h1>
+  <div id="sundial">
+    <div id="sun"></div>
+  </div>
+  <div id="clock">
+    <div class="hand hour" id="hourHand"></div>
+    <div class="hand minute" id="minuteHand"></div>
+  </div>
+  <div class="time-info">
+    <h3>Time: <span id="timeDisplay">6:00 AM</span></h3>
+  </div>
+  
+  <label for="sunPositionSlider">Adjust Sun Position:</label>
+  <input type="range" id="sunPositionSlider" min="0" max="360" step="1" value="0">
+  <button onclick="startSundial()">Start Simulation</button>
+
+  <script>
+    let sliderInterval;
+
+    // Function to update the sun's position, time, and clock hands based on slider
+    function updateSundial() {
+      let angle = document.getElementById("sunPositionSlider").value;
+
+      // Update the sun's rotation based on angle (from 0° to 360°)
+      const sunRadius = 120; // Radius of the circular path for the sun
+      const sunX = 150 + sunRadius * Math.cos((angle - 90) * Math.PI / 180);
+      const sunY = 150 + sunRadius * Math.sin((angle - 90) * Math.PI / 180);
+      document.getElementById("sun").style.left = `${sunX - 20}px`; // Adjusting for sun's size
+      document.getElementById("sun").style.top = `${sunY - 20}px`;  // Adjusting for sun's size
+
+      // Map the angle (0° to 360°) to time (6:00 AM to 6:00 PM)
+      let hours = 6 + (angle / 30);  // 30° per hour (12 hours = 360°)
+      if (hours >= 12) hours -= 12; // Convert to 12-hour format (12 AM/PM to 6 AM/PM)
+
+      // Adjusting based on positions
+      if (angle >= 0 && angle < 90) {
+        hours = 6 + (angle / 30); // Early morning, 6:00 AM to 9:00 AM
+      } else if (angle >= 90 && angle < 180) {
+        hours = 6 + (angle - 90) / 30; // Morning to noon, 9:00 AM to 12:00 PM
+      } else if (angle >= 180 && angle < 270) {
+        hours = 18 + (angle - 180) / 30; // Evening, 12:00 PM to 6:00 PM
+      } else if (angle >= 270 && angle <= 360) {
+        hours = 0 + (angle - 270) / 30; // Midnight to early morning, 6:00 PM to 6:00 AM
+      }
+
+      // Update clock hands based on the sun's angle
+      let hourAngle = (angle / 360) * 360; // Hour hand moves with the sun angle
+      let minuteAngle = (angle / 360) * 360; // Minute hand moves with the sun angle
+      document.getElementById("hourHand").style.transform = `rotate(${hourAngle}deg)`;
+      document.getElementById("minuteHand").style.transform = `rotate(${minuteAngle}deg)`;
+
+      // Update time display on the page
+      let timeDisplay = formatTime(hours);
+      document.getElementById("timeDisplay").textContent = timeDisplay;
+    }
+
+    // Function to format the time (in 12-hour format) and display it
+    function formatTime(hours) {
+      let suffix = hours >= 12 ? 'PM' : 'AM';
+      if (hours > 12) hours -= 12; // Convert to 12-hour format
+      return `${hours}:00 ${suffix}`;
+    }
+
+    // Event listener to update simulation based on slider input
+    document.getElementById("sunPositionSlider").addEventListener('input', updateSundial);
+
+    // Function to start the sundial simulation automatically (for testing)
+    function startSundial() {
+      let angle = parseInt(document.getElementById("sunPositionSlider").value);
+      clearInterval(sliderInterval); // Clear any previous intervals
+
+      sliderInterval = setInterval(() => {
+        angle += 1; // Slow down the movement by smaller increments (1 degree per second)
+        if (angle > 360) angle = 0; // Reset to 0 after reaching 360
+        document.getElementById("sunPositionSlider").value = angle;
+        updateSundial(); // Update the sundial
+      }, 30); // Update every 30ms for smoother/slower animation
+    }
+  </script>
+</body>
+</html>
